@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contact Form Test</title>
+    <style>
+        body { font-family: Arial; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 500px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
+        input, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 20px; }
+        button:hover { background: #764ba2; }
+        .message { margin-top: 20px; padding: 15px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        #output { margin-top: 20px; background: #f9f9f9; padding: 15px; border-radius: 4px; white-space: pre-wrap; font-family: monospace; font-size: 12px; display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Contact Form Test</h1>
+        <p>Test the contact form and see if emails work</p>
+        
+        <form id="testForm">
+            <input type="text" id="name" placeholder="Your Name" required>
+            <input type="email" id="email" placeholder="Your Email" required>
+            <input type="text" id="subject" placeholder="Subject" required>
+            <textarea id="messageText" placeholder="Your Message" rows="5" required></textarea>
+            <button type="submit">Send Test Message</button>
+        </form>
+        
+        <div id="statusMessage" class="message" style="display:none;"></div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('messageText').value;
+            
+            const formData = { name, email, subject, message };
+            
+            console.log('Sending:', formData);
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/contact.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                    mode: 'cors'
+                });
+                
+                const data = await response.json();
+                console.log('Response:', data);
+                
+                const msgDiv = document.getElementById('statusMessage');
+                const outputDiv = document.getElementById('output');
+                
+                if (data.success) {
+                    msgDiv.className = 'message success';
+                    msgDiv.textContent = '✓ ' + data.message;
+                    document.getElementById('testForm').reset();
+                } else {
+                    msgDiv.className = 'message error';
+                    msgDiv.textContent = '✗ ' + data.message;
+                }
+                
+                msgDiv.style.display = 'block';
+                outputDiv.textContent = JSON.stringify(data, null, 2);
+                outputDiv.style.display = 'block';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                const msgDiv = document.getElementById('statusMessage');
+                msgDiv.className = 'message error';
+                msgDiv.textContent = '✗ Error: ' + err.message;
+                msgDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
