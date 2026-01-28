@@ -18,7 +18,8 @@ function PortfolioPage() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/projects.php');
+      const apiUrl = process.env.REACT_APP_API_PROJECTS || 'http://localhost:8000/api/projects.php';
+      const response = await fetch(apiUrl);
       const data = await response.json();
       setProjects([...exampleProjects, ...data]);
       setLoading(false);

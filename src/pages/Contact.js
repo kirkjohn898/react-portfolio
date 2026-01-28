@@ -40,7 +40,8 @@ function ContactPage() {
     try {
       console.log('Sending form data:', formData);
       
-      const response = await fetch('http://localhost:8000/api/contact.php', {
+      const apiUrl = process.env.REACT_APP_API_CONTACT || 'http://localhost:8000/api/contact.php';
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
